@@ -1,66 +1,87 @@
 defmodule ConwayServer.Game do
   defstruct width: -1, height: -1, cells: []
 
+  def random(width, height) do
+    new_board(width, height, random_points(width, height))
+  end
+
+  def random_points(width, height) do
+    zipped = for x <- (0..width-1), y <- (0..height-1), do: {x, y}
+
+    zipped
+      |> Enum.map(fn(pos) -> {pos, spawn_rate} end)
+      |> Enum.filter(fn({_pos, alive}) -> alive end)
+  end
+
+  defp spawn_rate(percent \\ 0.05) do
+    :random.uniform <= percent
+  end
+
   def new(width, height, points \\ []) do
-    %{
+    cells = points |> Enum.map(&{&1, true})
+    new_board(width, height, cells)
+  end
+
+  defp new_board(width, height, cells) do
+    %ConwayServer.Game{
       width:  width,
       height: height,
-      cells:  build_cells(width, height, points)
+      cells:  build_cells(cells)
     }
   end
 
   def tick(game) do
-    cells = build_next_cells(game)
-    %{game | cells: cells}
+    %{game | cells: build_next_cells(game)}
   end
 
-  defp build_cells(width, height, points) do
-    Enum.map(0..width-1, fn x ->
-      Enum.map(0..height-1, fn y ->
-        alive = Enum.member?(points, {x, y})
-        %{pos: {x, y}, alive: alive}
-      end)
-    end)
+  defp build_cells(points) do
+    for {coordinate, true} <- points,
+      into: HashSet.new,
+      do:   coordinate
   end
 
   defp build_next_cells(game) do
-    Enum.map(0..game.width-1, fn x ->
-      Enum.map(0..game.height-1, fn y ->
-        cell      = cell_at(game.cells, x, y)
-        neighbors = alive_neighbors(game.cells, x, y)
-        alive     = alive_next?(cell.alive, neighbors)
-
-        %{pos: {x, y}, alive: alive}
-      end)
-    end)
+    alive_plus_neighbors(game.cells)
+      |> Enum.map(&{&1, next_cell_status(game.cells, &1)})
+      |> build_cells
   end
 
   def cell_at(cells, x, y) do
-    row = Enum.at(cells, x)
+    cell_at(cells, {x, y})
+  end
 
-    if row do
-      Enum.at(row, y)
+  def cell_at(cells, pos) do
+    HashSet.member?(cells, pos)
+  end
+
+  defp alive_plus_neighbors(cells) do
+    cells
+      |> Enum.flat_map(&[&1 | neighbors(&1)])
+      |> Enum.into(HashSet.new)
+  end
+
+  defp neighbors({cell_x, cell_y}) do
+   for x <- (cell_x - 1)..(cell_x + 1),
+       y <- (cell_y - 1)..(cell_y + 1),
+       (x != cell_x or y != cell_y),
+      do: {x, y}
+  end
+
+  defp alive_neighbors(cells, pos) do
+    neighbors(pos)
+      |> Enum.map(fn {x, y} -> if cell_at(cells, x, y), do: 1, else: 0 end)
+      |> Enum.sum
+  end
+
+  defp next_cell_status(cells, pos) do
+    alive     = cell_at(cells, pos)
+    neighbors = alive_neighbors(cells, pos)
+
+    case {alive, neighbors} do
+      {true, 2}  -> true
+      {true, 3}  -> true
+      {false, 3} -> true
+      {_, _}     -> false
     end
-  end
-
-  defp alive_neighbors(cells, x, y) do
-    Enum.reduce(x - 1..x + 1, 0, fn(x_cell, acc) ->
-      Enum.reduce(y - 1..y + 1, acc, fn(y_cell, acc) ->
-        cell = cell_at(cells, x_cell, y_cell)
-
-        if cell && (cell.pos != {x, y}) && cell.alive do
-          acc + 1
-        else
-          acc
-        end
-      end)
-    end)
-  end
-
-  defp alive_next?(true, 2), do: true
-  defp alive_next?(true, 3), do: true
-  defp alive_next?(false, 3), do: true
-  defp alive_next?(alive, neighbors) do
-    false
   end
 end
