@@ -1,2 +1,4 @@
 <script src="/js/phoenix.js"></script>
 <script src="/js/game_client.js"></script>
+
+<canvas id="game"></canvas>

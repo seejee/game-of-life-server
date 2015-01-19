@@ -13,7 +13,7 @@ defmodule ConwayServer.Game do
       |> Enum.filter(fn({_pos, alive}) -> alive end)
   end
 
-  defp spawn_rate(percent \\ 0.05) do
+  defp spawn_rate(percent \\ 0.075) do
     :random.uniform <= percent
   end
 

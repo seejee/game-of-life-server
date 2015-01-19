@@ -9,7 +9,6 @@ defmodule ConwayServer.GameServer do
 
   def init(_args) do
     game = Game.random(1000, 1000)
-    :erlang.send_after(1000, self, :tick)
     {:ok, game, 10_000}
   end
 
