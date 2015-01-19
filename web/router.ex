@@ -1,6 +1,10 @@
 defmodule ConwayServer.Router do
   use Phoenix.Router
 
+  socket "/ws", ConwayServer do
+    channel "game:*", GameChannel
+  end
+
   pipeline :browser do
     plug :accepts, ~w(html)
     plug :fetch_session

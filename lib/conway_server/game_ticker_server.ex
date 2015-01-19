@@ -1,6 +1,7 @@
 defmodule ConwayServer.GameTickerServer do
   use GenServer
 
+  alias ConwayServer.Game
   alias ConwayServer.GameServer
 
   def start_link do
@@ -13,8 +14,12 @@ defmodule ConwayServer.GameTickerServer do
   end
 
   def handle_info(:tick, _state) do
-    GameServer.tick
+    GameServer.tick |> broadcast
     :erlang.send_after(1000, self, :tick)
     {:noreply, _state}
+  end
+
+  def broadcast(game = %Game{}) do
+    Phoenix.Channel.broadcast "game:global", "game:data", Game.to_map(game)
   end
 end

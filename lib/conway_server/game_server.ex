@@ -1,15 +1,32 @@
 defmodule ConwayServer.GameServer do
-  use ExActor.GenServer, export: :conway_game_server
+  use GenServer
 
   alias ConwayServer.Game
 
-  defstart start_link, do: initial_state(Game.random(1000,1000))
-
-  defcall get, state: game do
-    game |> reply
+  def start_link do
+    GenServer.start_link(__MODULE__, :ok, name: :conway_game_server)
   end
 
-  defcast tick, state: game do
-    game |> Game.tick |> new_state
+  def init(_args) do
+    game = Game.random(1000, 1000)
+    :erlang.send_after(1000, self, :tick)
+    {:ok, game, 10_000}
+  end
+
+  def get do
+    GenServer.call(:conway_game_server, :get, 1_000)
+  end
+
+  def tick do
+    GenServer.call(:conway_game_server, :tick, 10_000)
+  end
+
+  def handle_call(:get, _from, game) do
+    {:reply, game, game}
+  end
+
+  def handle_call(:tick, _from, game) do
+    game = Game.tick(game)
+    {:reply, game, game}
   end
 end

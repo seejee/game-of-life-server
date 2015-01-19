@@ -30,8 +30,8 @@ defmodule ConwayServer.Game do
     }
   end
 
-  def tick(game) do
-    %{game | cells: build_next_cells(game)}
+  def tick(game = %ConwayServer.Game{}) do
+    %ConwayServer.Game{game | cells: build_next_cells(game)}
   end
 
   defp build_cells(points) do
@@ -52,6 +52,14 @@ defmodule ConwayServer.Game do
 
   def cell_at(cells, pos) do
     HashSet.member?(cells, pos)
+  end
+
+  def to_map(game) do
+    data = %{
+      width: game.width,
+      height: game.height,
+      cells:  Enum.map(game.cells, fn({x, y}) -> [x, y] end),
+    }
   end
 
   defp alive_plus_neighbors(cells) do
