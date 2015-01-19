@@ -7,7 +7,7 @@ defmodule ConwayServer.GameTest do
     game = Game.new(3, 3, [{1,1}, {1,2}])
     cell = game.cells
       |> Game.cell_at(1,1)
-   
+
     assert cell == true
   end
 
@@ -21,7 +21,7 @@ defmodule ConwayServer.GameTest do
 
     cell = game.cells
       |> Game.cell_at(1,1)
-   
+
     assert cell == false
   end
 

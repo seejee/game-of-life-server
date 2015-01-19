@@ -42,7 +42,7 @@ defmodule ConwayServer.Game do
 
   defp build_next_cells(game) do
     alive_plus_neighbors(game.cells)
-      |> Enum.map(&{&1, next_cell_status(game.cells, &1)})
+      |> Stream.map(&{&1, next_cell_status(game.cells, &1)})
       |> build_cells
   end
 

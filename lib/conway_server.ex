@@ -9,6 +9,8 @@ defmodule ConwayServer do
     children = [
       # Start the endpoint when the application starts
       worker(ConwayServer.Endpoint, []),
+      worker(ConwayServer.GameServer, []),
+      worker(ConwayServer.GameTickerServer, []),
 
       # Here you could define other workers and supervisors as children
       # worker(ConwayServer.Worker, [arg1, arg2, arg3]),
