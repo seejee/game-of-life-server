@@ -4,7 +4,7 @@ defmodule ConwayServer.Game do
   defstruct width: -1, height: -1, cells: []
 
   def random(width, height) do
-    new_board(width, height, random_points(width, height))
+    new(width, height, random_points(width, height))
   end
 
   def random_points(width, height) do
@@ -13,6 +13,7 @@ defmodule ConwayServer.Game do
     zipped
       |> Enum.map(fn(pos) -> {pos, spawn_rate} end)
       |> Enum.filter(fn({_pos, alive}) -> alive end)
+      |> Enum.map(fn({pos, _alive}) -> pos end)
   end
 
   defp spawn_rate(percent \\ 0.075) do
@@ -20,15 +21,10 @@ defmodule ConwayServer.Game do
   end
 
   def new(width, height, points \\ []) do
-    cells = points |> Enum.map(&{&1, true})
-    new_board(width, height, cells)
-  end
-
-  defp new_board(width, height, cells) do
     %ConwayServer.Game{
       width:  width,
       height: height,
-      cells:  build_cells(cells)
+      cells:  points |> Enum.into(HashSet.new)
     }
   end
 
@@ -36,27 +32,25 @@ defmodule ConwayServer.Game do
     %ConwayServer.Game{game | cells: build_next_cells(game)}
   end
 
-  defp build_cells(points) do
-    for {coordinate, true} <- points,
-      into: HashSet.new,
-      do:   coordinate
-  end
-
   defp build_next_cells(game) do
     alive_plus_neighbors(game.cells)
-      |> Enum.map(&{&1, next_cell_status(game.cells, &1)})
-      |> build_cells
+      |> Enum.reduce(HashSet.new, fn(pos, set) ->
+        case next_cell_status(game.cells, pos) do
+          true  -> Set.put(set, pos)
+          false -> set
+        end
+      end)
   end
 
   def cell_status(cells, pos) do
     if Set.member?(cells, pos), do: 1, else: 0
   end
 
-  def to_map(game) do
+  def to_map(game = %ConwayServer.Game{}) do
     %{
       width:  game.width,
       height: game.height,
-      cells:  Enum.map(game.cells, fn({x, y}) -> [x, y] end),
+      cells:  Enum.map(game.cells, fn({x, y}) -> [x, y] end)
     }
   end
 
@@ -98,10 +92,9 @@ defmodule ConwayServer.Game do
     neighbors = alive_neighbors(cells, pos)
 
     case {alive, neighbors} do
-      {1,  2} -> true
-      {1,  3} -> true
-      {0, 3} -> true
-      {_, _}     -> false
+      {1, 2} -> true
+      {_, 3} -> true
+      {_, _} -> false
     end
   end
 end
