@@ -6,9 +6,9 @@ defmodule ConwayServer.GameTest do
   test "initial board" do
     game = Game.new(3, 3, [{1,1}, {1,2}])
     cell = game.cells
-      |> Game.cell_at(1,1)
+      |> Game.cell_status({1,1})
 
-    assert cell == true
+    assert cell == 1
   end
 
   test "random board" do
@@ -20,9 +20,9 @@ defmodule ConwayServer.GameTest do
       |> Game.tick
 
     cell = game.cells
-      |> Game.cell_at(1,1)
+      |> Game.cell_status({1,1})
 
-    assert cell == false
+    assert cell == 0
   end
 
   test "an alive cell with 2 neighbors, lives" do
@@ -30,9 +30,9 @@ defmodule ConwayServer.GameTest do
       |> Game.tick
 
     cell = game.cells
-      |> Game.cell_at(1,1)
+      |> Game.cell_status({1,1})
 
-    assert cell == true
+    assert cell == 1
   end
 
   test "an alive cell with 3 neighbors, lives" do
@@ -40,9 +40,9 @@ defmodule ConwayServer.GameTest do
       |> Game.tick
 
     cell = game.cells
-      |> Game.cell_at(1,1)
+      |> Game.cell_status({1,1})
 
-    assert cell == true
+    assert cell == 1
   end
 
   test "an alive cell with 4 neighbors, dies" do
@@ -50,9 +50,9 @@ defmodule ConwayServer.GameTest do
       |> Game.tick
 
     cell = game.cells
-      |> Game.cell_at(1,1)
+      |> Game.cell_status({1,1})
 
-    assert cell == false
+    assert cell == 0
   end
 
   test "a dead cell with 2 neighbors, stays dead" do
@@ -60,9 +60,9 @@ defmodule ConwayServer.GameTest do
       |> Game.tick
 
     cell = game.cells
-      |> Game.cell_at(2,1)
+      |> Game.cell_status({2,1})
 
-    assert cell == false
+    assert cell == 0
   end
 
   test "a dead cell with 3 neighbors, lives" do
@@ -70,9 +70,9 @@ defmodule ConwayServer.GameTest do
       |> Game.tick
 
     cell = game.cells
-      |> Game.cell_at(2,1)
+      |> Game.cell_status({2,1})
 
-    assert cell == true
+    assert cell == 1
   end
 
   test "a dead cell with 4 neighbors, stays dead" do
@@ -80,9 +80,9 @@ defmodule ConwayServer.GameTest do
       |> Game.tick
 
     cell = game.cells
-      |> Game.cell_at(2,1)
+      |> Game.cell_status({2,1})
 
-    assert cell == false
+    assert cell == 0
   end
 end
 

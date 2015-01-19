@@ -24,7 +24,7 @@ defmodule ConwayServer.Mixfile do
   defp deps do
     [
      {:phoenix, github: "phoenixframework/phoenix"},
-     {:exactor, github: "sasa1977/exactor"},
+     {:exprof,  github: "parroty/exprof"},
      {:cowboy, "~> 1.0"}
    ]
   end

@@ -1,4 +1,6 @@
 defmodule ConwayServer.Game do
+  import ExProf.Macro
+
   defstruct width: -1, height: -1, cells: []
 
   def random(width, height) do
@@ -42,53 +44,63 @@ defmodule ConwayServer.Game do
 
   defp build_next_cells(game) do
     alive_plus_neighbors(game.cells)
-      |> Stream.map(&{&1, next_cell_status(game.cells, &1)})
+      |> Enum.map(&{&1, next_cell_status(game.cells, &1)})
       |> build_cells
   end
 
-  def cell_at(cells, x, y) do
-    cell_at(cells, {x, y})
-  end
-
-  def cell_at(cells, pos) do
-    HashSet.member?(cells, pos)
+  def cell_status(cells, pos) do
+    if Set.member?(cells, pos), do: 1, else: 0
   end
 
   def to_map(game) do
-    data = %{
-      width: game.width,
+    %{
+      width:  game.width,
       height: game.height,
       cells:  Enum.map(game.cells, fn({x, y}) -> [x, y] end),
     }
   end
 
-  defp alive_plus_neighbors(cells) do
+  def alive_plus_neighbors(cells) do
     cells
-      |> Enum.flat_map(&[&1 | neighbors(&1)])
+      |> Enum.flat_map(&neighbors(&1))
       |> Enum.into(HashSet.new)
+      |> Set.union(cells)
+  end
+
+  def profile_tick(game) do
+    profile do
+      tick(game)
+    end
   end
 
   defp neighbors({cell_x, cell_y}) do
-   for x <- (cell_x - 1)..(cell_x + 1),
-       y <- (cell_y - 1)..(cell_y + 1),
-       (x != cell_x or y != cell_y),
-      do: {x, y}
+    [
+      { cell_x - 1, cell_y - 1 },
+      { cell_x - 1, cell_y     },
+      { cell_x - 1, cell_y + 1 },
+      { cell_x,     cell_y - 1 },
+      { cell_x,     cell_y + 1 },
+      { cell_x + 1, cell_y - 1 },
+      { cell_x + 1, cell_y     },
+      { cell_x + 1, cell_y + 1 },
+    ]
   end
 
   defp alive_neighbors(cells, pos) do
     neighbors(pos)
-      |> Enum.map(fn {x, y} -> if cell_at(cells, x, y), do: 1, else: 0 end)
-      |> Enum.sum
+      |> Enum.reduce(0, fn(coord, acc) ->
+        acc + cell_status(cells, coord)
+      end)
   end
 
   defp next_cell_status(cells, pos) do
-    alive     = cell_at(cells, pos)
+    alive     = cell_status(cells, pos)
     neighbors = alive_neighbors(cells, pos)
 
     case {alive, neighbors} do
-      {true, 2}  -> true
-      {true, 3}  -> true
-      {false, 3} -> true
+      {1,  2} -> true
+      {1,  3} -> true
+      {0, 3} -> true
       {_, _}     -> false
     end
   end
