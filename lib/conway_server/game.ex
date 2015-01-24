@@ -11,13 +11,13 @@ defmodule ConwayServer.Game do
     zipped = for x <- (0..width-1), y <- (0..height-1), do: {x, y}
 
     zipped
-      |> Enum.map(fn(pos) -> {pos, spawn_rate} end)
+      |> Enum.map(fn(pos) -> {pos, randomly_alive?} end)
       |> Enum.filter(fn({_pos, alive}) -> alive end)
       |> Enum.map(fn({pos, _alive}) -> pos end)
   end
 
-  defp spawn_rate(percent \\ 0.05) do
-    :random.uniform <= percent
+  defp randomly_alive?(spawn_rate \\ 0.05) do
+    :random.uniform <= spawn_rate
   end
 
   def new(width, height, points \\ []) do
