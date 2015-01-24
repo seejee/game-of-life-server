@@ -16,7 +16,7 @@ defmodule ConwayServer.Game do
       |> Enum.map(fn({pos, _alive}) -> pos end)
   end
 
-  defp spawn_rate(percent \\ 0.075) do
+  defp spawn_rate(percent \\ 0.05) do
     :random.uniform <= percent
   end
 
@@ -29,17 +29,39 @@ defmodule ConwayServer.Game do
   end
 
   def tick(game = %ConwayServer.Game{}) do
-    %ConwayServer.Game{game | cells: build_next_cells(game)}
+    cells = fringe(game.cells)
+    %ConwayServer.Game{game | cells: build_next_cells_parallel(game, cells)}
+    #%ConwayServer.Game{game | cells: build_next_cells(game, cells)}
   end
 
-  defp build_next_cells(game) do
-    alive_plus_neighbors(game.cells)
-      |> Enum.reduce(HashSet.new, fn(pos, set) ->
-        case next_cell_status(game.cells, pos) do
-          true  -> Set.put(set, pos)
-          false -> set
-        end
-      end)
+  defp build_next_cells(game, cells) do
+    Enum.reduce(cells, HashSet.new, fn(pos, set) ->
+      case next_cell_status(game.cells, pos) do
+        true  -> Set.put(set, pos)
+        false -> set
+      end
+    end)
+  end
+
+  defp build_next_cells_parallel(game, cells, procs \\ :erlang.system_info(:schedulers_online)) do
+    parent = self
+
+    neighbors  = cells |> Set.to_list
+    chunk_size = round(length(neighbors) / procs)
+    chunks     = Enum.chunk(neighbors, chunk_size, chunk_size, [{-1, -1}])
+
+    Enum.each(chunks, fn(chunk) ->
+      spawn fn ->
+        child_set = build_next_cells(game, chunk)
+        send parent, {:game_set, child_set}
+      end
+    end)
+
+    Enum.reduce(1..length(chunks), HashSet.new, fn(_, set) ->
+      receive do
+        {:game_set, child_set} -> Set.union(set, child_set)
+      end
+    end)
   end
 
   def cell_status(cells, pos) do
@@ -54,7 +76,7 @@ defmodule ConwayServer.Game do
     }
   end
 
-  def alive_plus_neighbors(cells) do
+  def fringe(cells) do
     cells
       |> Enum.flat_map(&neighbors(&1))
       |> Enum.into(HashSet.new)
@@ -82,9 +104,13 @@ defmodule ConwayServer.Game do
 
   defp alive_neighbors(cells, pos) do
     neighbors(pos)
-      |> Enum.reduce(0, fn(coord, acc) ->
-        acc + cell_status(cells, coord)
-      end)
+      |> neighbor_count(cells)
+  end
+
+  defp neighbor_count(neighbors, cells) do
+    Enum.reduce(neighbors, 0, fn(coord, acc) ->
+      acc + cell_status(cells, coord)
+    end)
   end
 
   defp next_cell_status(cells, pos) do
