@@ -3,6 +3,9 @@ defmodule ConwayServer.Game do
 
   defstruct width: -1, height: -1, cells: []
 
+  @alive 1
+  @dead  0
+
   def random(width, height) do
     new(width, height, random_points(width, height))
   end
@@ -31,7 +34,6 @@ defmodule ConwayServer.Game do
   def tick(game = %ConwayServer.Game{}) do
     cells = fringe(game.cells)
     %ConwayServer.Game{game | cells: build_next_cells_parallel(game, cells)}
-    #%ConwayServer.Game{game | cells: build_next_cells(game, cells)}
   end
 
   defp build_next_cells(game, cells) do
@@ -53,19 +55,19 @@ defmodule ConwayServer.Game do
     Enum.each(chunks, fn(chunk) ->
       spawn fn ->
         child_set = build_next_cells(game, chunk)
-        send parent, {:game_set, child_set}
+        send parent, {:conway_chunk, child_set}
       end
     end)
 
     Enum.reduce(1..length(chunks), HashSet.new, fn(_, set) ->
       receive do
-        {:game_set, child_set} -> Set.union(set, child_set)
+        {:conway_chunk, child_set} -> Set.union(set, child_set)
       end
     end)
   end
 
   def cell_status(cells, pos) do
-    if Set.member?(cells, pos), do: 1, else: 0
+    if Set.member?(cells, pos), do: @alive, else: @dead
   end
 
   def to_map(game = %ConwayServer.Game{}) do
@@ -114,13 +116,13 @@ defmodule ConwayServer.Game do
   end
 
   defp next_cell_status(cells, pos) do
-    alive     = cell_status(cells, pos)
-    neighbors = alive_neighbors(cells, pos)
+    status     = cell_status(cells, pos)
+    neighbors  = alive_neighbors(cells, pos)
 
-    case {alive, neighbors} do
-      {1, 2} -> true
-      {_, 3} -> true
-      {_, _} -> false
+    case {status, neighbors} do
+      {@alive, 2} -> true
+      {_,      3} -> true
+      {_,      _} -> false
     end
   end
 end
