@@ -13,6 +13,9 @@ defmodule ConwayServer.GameTest do
 
   test "random board" do
     game = Game.random(3, 3)
+
+    assert game.width == 3
+    assert game.height == 3
   end
 
   test "an alive cell with 1 neighbors, dies" do
