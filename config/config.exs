@@ -10,7 +10,7 @@ config :conway_server, ConwayServer.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "UPWz1s5hdMSjrItGT2kDztuHSCGhsdDoTbCJL0G9N7e/lQsyuJZhDipVe3dZCjGI",
   debug_errors: false,
-  pubsub: [adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: ConwayServer.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,

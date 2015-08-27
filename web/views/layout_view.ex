@@ -1,3 +1,3 @@
 defmodule ConwayServer.LayoutView do
-  use ConwayServer.View
+  use ConwayServer.Web, :view
 end

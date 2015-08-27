@@ -1,5 +1,5 @@
 defmodule ConwayServer.PageController do
-  use Phoenix.Controller
+  use ConwayServer.Web, :controller
 
   plug :action
 

@@ -1,3 +1,3 @@
 defmodule ConwayServer.PageView do
-  use ConwayServer.View
+  use ConwayServer.Web, :view
 end
