@@ -6,7 +6,7 @@ $(function() {
   var lastLoop = new Date;
 
   var drawBoard = function(data) {
-    $canvas = $('#game');
+    var $canvas = $('#game');
 
     if(first) {
       $canvas.attr({width: data.width * CELL_SIZE, height: data.height * CELL_SIZE});
