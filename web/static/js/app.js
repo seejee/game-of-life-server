@@ -29,9 +29,12 @@ $(function() {
     });
   };
 
-  socket.join("game:global", {}).receive("ok", function(channel) {
-    channel.on("game:data", function(data) {
-      drawBoard(data);
-    });
+  var channel = socket.chan("game:global", {});
+
+  channel.on("game:data", function(data) {
+    drawBoard(data);
+  });
+
+  channel.join().receive("ok", function() {
   });
 });
