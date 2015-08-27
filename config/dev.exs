@@ -6,9 +6,6 @@ config :conway_server, ConwayServer.Endpoint,
   cache_static_lookup: false,
   watchers: [{Path.expand("node_modules/brunch/bin/brunch"), ["watch"]}]
 
-# Enables code reloading for development
-config :phoenix, :code_reloader, true
-
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
 
@@ -17,6 +14,11 @@ config :logger, :console, format: "[$level] $message\n"
 # will use higher CPU in dev as the number of files
 # grow. Adjust as necessary.
 config :conway_server, ConwayServer.Endpoint,
-  live_reload: [Path.expand("priv/static/js/app.js"),
-                Path.expand("priv/static/css/app.css"),
-                Path.expand("web/templates/**/*.eex")]
+  code_reloader: true,
+  live_reload: [
+    # url is optional
+    url: "ws://localhost:4000",
+    # `:patterns` replace `:paths` and are required for live reload
+    patterns: [~r{priv/static/.*(js|css|png|jpeg|jpg|gif)$},
+               ~r{web/views/.*(ex)$},
+               ~r{web/templates/.*(eex)$}]]

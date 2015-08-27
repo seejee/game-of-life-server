@@ -26,4 +26,9 @@ defmodule ConwayServer.Endpoint do
     encryption_salt: "UFduZExQ"
 
   plug :router, ConwayServer.Router
+
+  if code_reloading? do
+    plug Phoenix.LiveReloader
+    plug Phoenix.CodeReloader
+  end
 end
