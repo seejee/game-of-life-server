@@ -22,6 +22,6 @@ defmodule ConwayServer.GameTickerServer do
   end
 
   def broadcast(game = %Game{}) do
-    Phoenix.Channel.broadcast "game:global", "game:data", Game.to_map(game)
+    ConwayServer.Endpoint.broadcast! "game:global", "game:data", Game.to_map(game)
   end
 end

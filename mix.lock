@@ -1,10 +1,10 @@
-%{"cowboy": {:hex, :cowboy, "1.0.0"},
+%{"cowboy": {:hex, :cowboy, "1.0.2"},
   "cowlib": {:hex, :cowlib, "1.0.1"},
   "exactor": {:git, "git://github.com/sasa1977/exactor.git", "a5d9261aa046d7d605bf4a9c4c5e52ea9c1bac25", []},
   "exprintf": {:hex, :exprintf, "0.1.6"},
   "exprof": {:git, "git://github.com/parroty/exprof.git", "5b1d1ad2fb7cc587042e4662216ecef27020e2ef", []},
   "parallel": {:git, "git://github.com/eproxus/parallel.git", "3b628c5425e0f9ff6c786e726bda9cc3d69da326", []},
-  "phoenix": {:git, "git://github.com/phoenixframework/phoenix.git", "ba13b413a42cd52029963707e52ccd8d0b3db997", []},
-  "plug": {:hex, :plug, "0.9.0"},
+  "phoenix": {:hex, :phoenix, "0.9.0"},
+  "plug": {:hex, :plug, "0.10.0"},
   "poison": {:hex, :poison, "1.3.0"},
-  "ranch": {:hex, :ranch, "1.0.0"}}
+  "ranch": {:hex, :ranch, "1.1.0"}}

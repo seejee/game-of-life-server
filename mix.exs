@@ -23,9 +23,10 @@ defmodule ConwayServer.Mixfile do
   # Type `mix help deps` for examples and options
   defp deps do
     [
-     {:phoenix, github: "phoenixframework/phoenix"},
+     {:phoenix, "0.9.0"},
+     {:plug,    "0.10.0"},
      {:exprof,  github: "parroty/exprof"},
-     {:cowboy, "~> 1.0"}
+     {:cowboy,  "~> 1.0"}
    ]
   end
 end

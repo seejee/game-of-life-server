@@ -1,7 +1,7 @@
 $(function() {
   var socket = new Phoenix.Socket("/ws");
 
-  var CELL_SIZE = 3;
+  var CELL_SIZE = 4;
   var first = true;
   var lastLoop = new Date;
 
@@ -24,7 +24,7 @@ $(function() {
     ctx.fillStyle = "#000000";
 
     _.each(data.cells, function(cell) {
-      ctx.fillRect(cell[0] * CELL_SIZE, cell[1] * CELL_SIZE,CELL_SIZE,CELL_SIZE);
+      ctx.fillRect(cell[0] * CELL_SIZE, cell[1] * CELL_SIZE, CELL_SIZE, CELL_SIZE);
     });
   };
 

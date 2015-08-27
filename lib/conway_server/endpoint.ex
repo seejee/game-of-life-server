@@ -2,7 +2,8 @@ defmodule ConwayServer.Endpoint do
   use Phoenix.Endpoint, otp_app: :conway_server
 
   plug Plug.Static,
-    at: "/", from: :conway_server
+    at: "/", from: :conway_server,
+    only: ~w(css images js favicon.ico robots.txt)
 
   plug Plug.Logger
 
